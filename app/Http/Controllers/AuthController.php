@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
@@ -18,9 +19,9 @@ class AuthController extends Controller
 
         try {
             $user = User::create([
-                'name' => $validateData(['name']),
-                'email' => $validateData(['email']),
-                'password' => $validateData(['password'])
+                'name' => $validateData['name'],
+                'email' => $validateData['email'],
+                'password' => bcrypt($validateData['password'])
             ]);
 
             $token = $user->createToken('auth_token')->plainTextToken;
@@ -31,6 +32,7 @@ class AuthController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            Log::error('error: ' . $e->getMessage());
             return response()->json([
                 'error' => 'Registrasi Gagal, Silahkan Coba Lagi.'
             ], 500);
@@ -56,6 +58,7 @@ class AuthController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            Log::error('error: ' . $e->getMessage());
             return response()->json([
                 'error' => 'Login Gagal, Silahkan Coba Lagi.'
             ], 500);
